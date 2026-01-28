@@ -2,5 +2,15 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "vite",
-  "outputDirectory": "frontend/dist"
+  "outputDirectory": "frontend/dist",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ]
 }
