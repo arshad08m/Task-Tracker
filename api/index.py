@@ -227,19 +227,38 @@ async def root():
     """Health check endpoint"""
     try:
         init_db()  # Ensure DB is initialized on first request
-    except:
-        pass
-    return {"message": "Task Tracker API is running", "version": "1.0.0"}
+    except Exception as e:
+        return {"message": "Task Tracker API is running", "version": "1.0.0", "db_init_error": str(e)}
+    return {"message": "Task Tracker API is running", "version": "1.0.0", "db_initialized": _db_initialized}
+
+@app.get("/debug")
+async def debug_info():
+    """Debug endpoint to check database status"""
+    import sys
+    import os
+    return {
+        "python_version": sys.version,
+        "cwd": os.getcwd(),
+        "database_url": DATABASE_URL,
+        "upload_dir": UPLOAD_DIR,
+        "tmp_exists": os.path.exists("/tmp"),
+        "tmp_writable": os.access("/tmp", os.W_OK),
+        "db_initialized": _db_initialized
+    }
 
 @app.get("/users", response_model=List[UserResponse])
 async def get_users(db: Session = Depends(get_db)):
     """Get all users"""
     try:
         users = db.query(User).all()
+        print(f"Found {len(users)} users")
         return users if users else []
     except Exception as e:
-        print(f"Error fetching users: {e}")
-        return []
+        print(f"Error fetching users: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        # Return error details for debugging
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 @app.get("/tasks", response_model=List[TaskResponse])
 async def get_tasks(
