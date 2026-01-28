@@ -200,12 +200,8 @@ def init_db():
         print(f"⚠️ Database initialization warning: {e}")
         _db_initialized = True  # Mark as attempted to avoid retry loops
 
-# Create FastAPI app with root_path for Vercel serverless
-app = FastAPI(
-    title="Task Tracker API", 
-    version="1.0.0",
-    root_path="/api"
-)
+# Create FastAPI app for Vercel
+app = FastAPI(title="Task Tracker API", version="1.0.0")
 
 # CORS middleware
 app.add_middleware(
