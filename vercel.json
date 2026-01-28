@@ -1,16 +1,16 @@
 {
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
+  "buildCommand": "cd frontend && npm run build",
+  "installCommand": "cd frontend && npm install",
   "framework": "vite",
   "outputDirectory": "frontend/dist",
-  "builds": [
+  "rewrites": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/api"
     },
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
