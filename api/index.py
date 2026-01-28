@@ -13,7 +13,7 @@ from pathlib import Path
 from mangum import Mangum
 
 # Database setup - Use environment variable or default to SQLite
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./tasks.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////tmp/tasks.db")
 engine = create_engine(
     DATABASE_URL,
     connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
@@ -210,6 +210,11 @@ app.add_middleware(
 
 # Database dependency
 def get_db():
+    try:
+        # Ensure database is initialized
+        Base.metadata.create_all(bind=engine)
+    except:
+        pass
     db = SessionLocal()
     try:
         yield db
