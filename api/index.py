@@ -201,7 +201,12 @@ def init_db():
         _db_initialized = True  # Mark as attempted to avoid retry loops
 
 # Create FastAPI app for Vercel
-app = FastAPI(title="Task Tracker API", version="1.0.0")
+# root_path tells FastAPI to strip /api prefix from incoming requests
+app = FastAPI(
+    title="Task Tracker API", 
+    version="1.0.0",
+    root_path="/api"
+)
 
 # CORS middleware
 app.add_middleware(
