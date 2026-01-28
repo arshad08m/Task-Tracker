@@ -499,7 +499,5 @@ async def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
     db.commit()
     return None
 
-# Vercel automatically detects and serves FastAPI apps
-# No need for Mangum wrapper in Vercel's Python runtime
-
-
+# Handler for Vercel serverless functions
+handler = Mangum(app, lifespan="off")
