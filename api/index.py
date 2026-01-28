@@ -128,63 +128,66 @@ class TaskResponse(TaskBase):
 # Initialize database and seed data
 def init_db():
     """Create tables and seed initial data"""
-    Base.metadata.create_all(bind=engine)
-    
-    db = SessionLocal()
     try:
-        existing_users = db.query(User).count()
-        if existing_users == 0:
-            user_a = User(username="user_a", display_name="Hehe")
-            user_b = User(username="user_b", display_name="Haha")
-            db.add(user_a)
-            db.add(user_b)
-            db.commit()
-            
-            sample_tasks = [
-                Task(
-                    title="Setup development environment",
-                    description="Install all necessary tools and dependencies",
-                    assigned_to=user_a.id,
-                    status="Completed",
-                    completed_at=datetime.utcnow()
-                ),
-                Task(
-                    title="Design database schema",
-                    description="Create ERD and define relationships",
-                    assigned_to=user_b.id,
-                    status="Completed",
-                    completed_at=datetime.utcnow()
-                ),
-                Task(
-                    title="Implement API endpoints",
-                    description="Build REST API with FastAPI",
-                    assigned_to=user_a.id,
-                    status="Pending"
-                ),
-                Task(
-                    title="Build React frontend",
-                    description="Create responsive UI with React and TailwindCSS",
-                    assigned_to=user_b.id,
-                    status="Pending"
-                ),
-            ]
-            
-            for task in sample_tasks:
-                db.add(task)
-            
-            db.commit()
-            
-            task_1 = db.query(Task).first()
-            if task_1:
-                note_1 = Note(task_id=task_1.id, content="Started with Python 3.11 installation")
-                note_2 = Note(task_id=task_1.id, content="Configured virtual environment successfully")
-                db.add(note_1)
-                db.add(note_2)
+        Base.metadata.create_all(bind=engine)
+        
+        db = SessionLocal()
+        try:
+            existing_users = db.query(User).count()
+            if existing_users == 0:
+                user_a = User(username="user_a", display_name="Hehe")
+                user_b = User(username="user_b", display_name="Haha")
+                db.add(user_a)
+                db.add(user_b)
                 db.commit()
-            
-            print("✅ Database initialized with sample data")
-    finally:
-        db.close()
+                
+                sample_tasks = [
+                    Task(
+                        title="Setup development environment",
+                        description="Install all necessary tools and dependencies",
+                        assigned_to=user_a.id,
+                        status="Completed",
+                        completed_at=datetime.utcnow()
+                    ),
+                    Task(
+                        title="Design database schema",
+                        description="Create ERD and define relationships",
+                        assigned_to=user_b.id,
+                        status="Completed",
+                        completed_at=datetime.utcnow()
+                    ),
+                    Task(
+                        title="Implement API endpoints",
+                        description="Build REST API with FastAPI",
+                        assigned_to=user_a.id,
+                        status="Pending"
+                    ),
+                    Task(
+                        title="Build React frontend",
+                        description="Create responsive UI with React and TailwindCSS",
+                        assigned_to=user_b.id,
+                        status="Pending"
+                    ),
+                ]
+                
+                for task in sample_tasks:
+                    db.add(task)
+                
+                db.commit()
+                
+                task_1 = db.query(Task).first()
+                if task_1:
+                    note_1 = Note(task_id=task_1.id, content="Started with Python 3.11 installation")
+                    note_2 = Note(task_id=task_1.id, content="Configured virtual environment successfully")
+                    db.add(note_1)
+                    db.add(note_2)
+                    db.commit()
+                
+                print("✅ Database initialized with sample data")
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"⚠️ Database initialization warning: {e}")
 
 # Initialize database on app startup
 @asynccontextmanager
@@ -218,13 +221,21 @@ def get_db():
 @app.get("/")
 async def root():
     """Health check endpoint"""
+    try:
+        init_db()  # Ensure DB is initialized on first request
+    except:
+        pass
     return {"message": "Task Tracker API is running", "version": "1.0.0"}
 
 @app.get("/users", response_model=List[UserResponse])
 async def get_users(db: Session = Depends(get_db)):
     """Get all users"""
-    users = db.query(User).all()
-    return users if users else []
+    try:
+        users = db.query(User).all()
+        return users if users else []
+    except Exception as e:
+        print(f"Error fetching users: {e}")
+        return []
 
 @app.get("/tasks", response_model=List[TaskResponse])
 async def get_tasks(
