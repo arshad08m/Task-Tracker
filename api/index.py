@@ -6,20 +6,23 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from datetime import datetime
-from contextlib import asynccontextmanager
 import os
 import json
 from pathlib import Path
 from mangum import Mangum
 
 # Database setup - Use environment variable or default to SQLite
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////tmp/tasks.db")
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
-)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+try:
+    DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////tmp/tasks.db")
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+    )
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    Base = declarative_base()
+except Exception as e:
+    print(f"Database setup error: {e}")
+    raise
 
 # Create uploads directory
 UPLOAD_DIR = "/tmp/uploads"  # Use /tmp for serverless environments
@@ -496,5 +499,10 @@ async def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
     db.commit()
     return None
 
-# Mangum handler for Vercel
-handler = Mangum(app)
+# Mangum handler for Vercel - must be at module level
+try:
+    handler = Mangum(app, lifespan="off")
+except Exception as e:
+    print(f"Error creating handler: {e}")
+    # Fallback handler
+    handler = Mangum(app)
