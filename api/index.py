@@ -125,9 +125,16 @@ class TaskResponse(TaskBase):
     assigned_user: UserResponse
     notes: List[NoteResponse] = []
 
+# Global flag to track if DB is initialized
+_db_initialized = False
+
 # Initialize database and seed data
 def init_db():
     """Create tables and seed initial data"""
+    global _db_initialized
+    if _db_initialized:
+        return
+    
     try:
         Base.metadata.create_all(bind=engine)
         
@@ -184,20 +191,15 @@ def init_db():
                     db.commit()
                 
                 print("✅ Database initialized with sample data")
+            _db_initialized = True
         finally:
             db.close()
     except Exception as e:
         print(f"⚠️ Database initialization warning: {e}")
+        _db_initialized = True  # Mark as attempted to avoid retry loops
 
-# Initialize database on app startup
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    init_db()
-    yield
-    pass
-
-# Create FastAPI app
-app = FastAPI(title="Task Tracker API", version="1.0.0", lifespan=lifespan)
+# Create FastAPI app (removed lifespan to avoid serverless issues)
+app = FastAPI(title="Task Tracker API", version="1.0.0")
 
 # CORS middleware
 app.add_middleware(
@@ -210,11 +212,8 @@ app.add_middleware(
 
 # Database dependency
 def get_db():
-    try:
-        # Ensure database is initialized
-        Base.metadata.create_all(bind=engine)
-    except:
-        pass
+    # Initialize database on first access
+    init_db()
     db = SessionLocal()
     try:
         yield db
