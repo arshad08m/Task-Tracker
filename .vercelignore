@@ -1,0 +1,13 @@
+backend/
+setup.bat
+setup.sh
+deploy.bat
+deploy.sh
+DEPLOYMENT.md
+DEPLOYMENT_READY.md
+DEPLOYMENT_VERCEL.md
+QUICKSTART.md
+VERCEL_QUICK_START.md
+.git/
+.gitignore
+{frontend,backend}/
