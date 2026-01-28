@@ -9,7 +9,6 @@ from datetime import datetime
 import os
 import json
 from pathlib import Path
-from mangum import Mangum
 
 # Database setup - Use environment variable or default to SQLite
 try:
@@ -499,5 +498,4 @@ async def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
     db.commit()
     return None
 
-# Handler for Vercel serverless functions
-handler = Mangum(app, lifespan="off")
+# Vercel will automatically use the 'app' variable for ASGI
