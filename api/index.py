@@ -13,9 +13,19 @@ from pathlib import Path
 # Database setup - Use environment variable or default to SQLite
 try:
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////tmp/tasks.db")
+    
+    # Convert postgres:// to postgresql:// for SQLAlchemy 2.0 compatibility
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    
+    # Configure connection based on database type
+    is_sqlite = "sqlite" in DATABASE_URL
+    connect_args = {"check_same_thread": False} if is_sqlite else {}
+    
     engine = create_engine(
         DATABASE_URL,
-        connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+        connect_args=connect_args,
+        pool_pre_ping=True  # Test connections before using them
     )
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     Base = declarative_base()
