@@ -53,10 +53,11 @@ function App() {
   const fetchUsers = async () => {
     try {
       const data = await apiService.getUsers();
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       toast.error('Failed to load users');
       console.error('Error fetching users:', error);
+      setUsers([]);
     }
   };
 
@@ -67,11 +68,14 @@ function App() {
     try {
       setLoading(true);
       const data = await apiService.getTasks(filters);
-      setTasks(data);
-      setFilteredTasks(data);
+      const tasksArray = Array.isArray(data) ? data : [];
+      setTasks(tasksArray);
+      setFilteredTasks(tasksArray);
     } catch (error) {
       toast.error('Failed to load tasks');
       console.error('Error fetching tasks:', error);
+      setTasks([]);
+      setFilteredTasks([]);
     } finally {
       setLoading(false);
     }

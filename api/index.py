@@ -224,7 +224,7 @@ async def root():
 async def get_users(db: Session = Depends(get_db)):
     """Get all users"""
     users = db.query(User).all()
-    return users
+    return users if users else []
 
 @app.get("/tasks", response_model=List[TaskResponse])
 async def get_tasks(
@@ -242,7 +242,7 @@ async def get_tasks(
         query = query.filter(Task.status == status)
     
     tasks = query.order_by(Task.created_at.desc()).all()
-    return tasks
+    return tasks if tasks else []
 
 @app.get("/tasks/{task_id}", response_model=TaskResponse)
 async def get_task(task_id: int, db: Session = Depends(get_db)):
