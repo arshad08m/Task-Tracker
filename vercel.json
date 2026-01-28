@@ -1,8 +1,7 @@
 {
-  "buildCommand": "cd frontend && npm run build",
+  "buildCommand": "cd frontend && npm ci && npm run build",
   "framework": "vite",
   "outputDirectory": "frontend/dist",
-  "installCommand": "npm install --prefer-offline",
   "functions": {
     "api/index.py": {
       "runtime": "python3.11"
