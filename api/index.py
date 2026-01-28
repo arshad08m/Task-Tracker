@@ -503,4 +503,6 @@ async def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
     db.commit()
     return None
 
-# Vercel will automatically use the 'app' variable for ASGI
+# Export for Vercel - must be named 'app' for ASGI or create handler
+# Vercel's Python runtime automatically detects 'app' as the ASGI application
+
