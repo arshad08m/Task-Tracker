@@ -500,9 +500,6 @@ async def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
     return None
 
 # Mangum handler for Vercel - must be at module level
-try:
-    handler = Mangum(app, lifespan="off")
-except Exception as e:
-    print(f"Error creating handler: {e}")
-    # Fallback handler
-    handler = Mangum(app)
+# Vercel requires this specific name
+handler = Mangum(app, lifespan="off", api_gateway_base_path="/api")
+
