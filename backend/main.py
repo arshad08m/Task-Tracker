@@ -10,7 +10,6 @@ from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
 from datetime import datetime
-from contextlib import asynccontextmanager
 import os
 import shutil
 from pathlib import Path
@@ -143,20 +142,16 @@ class TaskResponse(TaskBase):
     assigned_user: UserResponse
     notes: List[NoteResponse] = []
 
-# Initialize FastAPI app with lifespan context
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup: Initialize database
-    try:
-        init_db()
-        print("✅ Database initialized")
-    except Exception as e:
-        print(f"⚠️ Database initialization error: {e}")
-    yield
-    # Shutdown: Cleanup if needed
-    pass
+# Initialize FastAPI app
+app = FastAPI(title="Task Tracker API", version="1.0.0")
 
-app = FastAPI(title="Task Tracker API", version="1.0.0", lifespan=lifespan)
+# Initialize database on startup
+try:
+    Base.metadata.create_all(bind=engine)
+    init_db()
+    print("✅ Database initialized with tables and seed data")
+except Exception as e:
+    print(f"⚠️ Database initialization warning: {e}")
 
 # Mount uploads directory for static file serving
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
