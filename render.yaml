@@ -21,14 +21,11 @@ services:
   - type: web
     name: task-tracker-frontend
     runtime: static
-    buildCommand: cd frontend && npm install && npm run build
+    buildCommand: cd frontend && npm ci && npm run build
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: task-tracker-api
-          envVarKey: RENDER_EXTERNAL_URL
+        value: https://task-tracker-api.onrender.com
     routes:
       - type: rewrite
         source: /*
