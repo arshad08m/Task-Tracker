@@ -25,7 +25,7 @@ services:
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_API_URL
-        value: https://task-tracker-api.onrender.com
+        value: https://task-tracker-api-uonh.onrender.com
     routes:
       - type: rewrite
         source: /*
