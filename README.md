@@ -6,7 +6,7 @@ A modern, full-stack task management application built with **React** and **Fast
 ![React](https://img.shields.io/badge/React-18.2-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.104-green)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.3-blue)
-![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black?logo=vercel)
+![Deploy](https://img.shields.io/badge/Deploy-Vercel%20%7C%20Render-blueviolet)
 
 ## ✨ Features
 
@@ -331,13 +331,52 @@ npm install
 - Check CORS settings in `main.py`
 - Verify `VITE_API_URL` in frontend `.env`
 
-## 🚀 Vercel Deployment
+## 🚀 Deployment Options
+
+This Task Tracker can be deployed to multiple platforms:
+
+### Deploy to Render (Recommended for Full-Stack)
+
+Render provides free hosting for both frontend and backend with PostgreSQL database.
+
+**Quick Deploy:**
+```bash
+# Test your setup before deploying
+# Windows
+test-render.bat
+
+# macOS/Linux
+chmod +x test-render.sh
+./test-render.sh
+```
+
+**Deploy Steps:**
+1. Push your code to GitHub/GitLab
+2. Go to [Render Dashboard](https://dashboard.render.com/)
+3. Click "New +" → "Blueprint"
+4. Connect your repository
+5. Render will detect `render.yaml` and automatically:
+   - Create PostgreSQL database
+   - Deploy backend API
+   - Deploy frontend static site
+   - Connect everything together
+
+**Features:**
+- ✅ Free PostgreSQL database (256 MB)
+- ✅ Automatic HTTPS
+- ✅ Zero-downtime deployments
+- ✅ Environment variables management
+- ✅ Auto-deploy on git push
+
+**Detailed Instructions:** See [DEPLOYMENT_RENDER.md](./DEPLOYMENT_RENDER.md)
+
+---
+
+### Deploy to Vercel (Frontend + Serverless API)
 
 Deploy your Task Tracker to Vercel for free with automatic CI/CD!
 
-### Quick Deploy
-
-**Option 1: Using Deploy Script**
+**Quick Deploy:**
 ```bash
 # Windows
 .\deploy.bat
@@ -347,7 +386,7 @@ chmod +x deploy.sh
 ./deploy.sh
 ```
 
-**Option 2: Manual Deployment**
+**Manual Deployment:**
 
 1. **Push to GitHub**
    ```bash
@@ -373,20 +412,55 @@ chmod +x deploy.sh
    - Frontend: `https://your-project.vercel.app`
    - API: `https://your-project.vercel.app/api`
 
-### Environment Variables for Production
+**Detailed Instructions:** See [DEPLOYMENT_VERCEL.md](./DEPLOYMENT_VERCEL.md)
 
-Set these in Vercel project settings:
-```
-VITE_API_URL=https://your-project.vercel.app/api
-DATABASE_URL=your_production_database_url
-```
+---
 
-For detailed deployment instructions, see [DEPLOYMENT_VERCEL.md](./DEPLOYMENT_VERCEL.md)
+### Comparison: Render vs Vercel
 
-## 🚀 Production Deployment
+| Feature | Render | Vercel |
+|---------|--------|--------|
+| **Backend** | Full server support | Serverless functions |
+| **Database** | Free PostgreSQL included | External DB needed |
+| **Running in Production Mode
 
-### Backend
+**Backend:**
 ```bash
+# Install gunicorn (production server)
+pip install gunicorn
+
+# Run with gunicorn
+gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+```
+
+**Frontend:**
+```bash
+# Build for production
+cd frontend
+npm run build
+
+# Preview production build locally
+npm run preview
+
+# The built files will be in 'frontend/dist' folder
+# Deploy these files to any static hosting service
+```
+
+### Using PostgreSQL in Production
+
+Update your backend to use PostgreSQL instead of SQLite:
+
+```bash
+# Install PostgreSQL driver
+pip install psycopg2-binary
+
+# Set DATABASE_URL environment variable
+export DATABASE_URL="postgresql://user:password@host:port/dbname"
+
+# The app will automatically use PostgreSQL
+```
+
+---
 # Install gunicorn
 pip install gunicorn
 

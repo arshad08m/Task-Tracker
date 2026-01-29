@@ -6,13 +6,28 @@ task-tracker/
 ├── 📄 README.md                    # Main documentation
 ├── 📄 QUICKSTART.md                # Quick start guide  
 ├── 📄 API_DOCS.md                  # API reference
+├── 📄 PROJECT_STRUCTURE.md         # This file
+├── 📄 FEATURES.md                  # Features documentation
 ├── 📄 .gitignore                   # Git ignore rules
+│
+├── 🚀 Deployment Files
+│   ├── render.yaml                 # Render Blueprint configuration
+│   ├── vercel.json                 # Vercel configuration
+│   ├── DEPLOYMENT_RENDER.md        # Render deployment guide
+│   ├── DEPLOYMENT_VERCEL.md        # Vercel deployment guide
+│   ├── RENDER_QUICK_START.md       # Quick Render setup
+│   ├── test-render.sh              # Test script (Linux/Mac)
+│   ├── test-render.bat             # Test script (Windows)
+│   ├── deploy.sh                   # Vercel deploy (Linux/Mac)
+│   └── deploy.bat                  # Vercel deploy (Windows)
+│
 ├── 🔧 setup.sh                     # macOS/Linux setup script
 ├── 🔧 setup.bat                    # Windows setup script
 │
 ├── 🐍 backend/                     # Python FastAPI Backend
 │   ├── main.py                     # Main application with all endpoints
 │   ├── requirements.txt            # Python dependencies
+│   ├── uploads/                    # File uploads directory
 │   └── tasks.db                    # SQLite database (auto-created)
 │
 └── ⚛️  frontend/                    # React Frontend
@@ -45,9 +60,10 @@ task-tracker/
 ```
 
 ## 📊 File Count
-- **Total Files**: 25+
-- **Python Files**: 1
+- **Total Files**: 35+
+- **Python Files**: 2
 - **JavaScript/JSX Files**: 12
+- **Deployment Files**: 9
 - **Configuration Files**: 7
 - **Documentation Files**: 5
 

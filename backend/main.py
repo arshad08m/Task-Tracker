@@ -17,7 +17,20 @@ from pathlib import Path
 
 # Database setup
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./tasks.db")
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+# Convert postgres:// to postgresql:// for SQLAlchemy 2.0 compatibility (Render compatibility)
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Configure connection based on database type
+is_sqlite = "sqlite" in DATABASE_URL
+connect_args = {"check_same_thread": False} if is_sqlite else {}
+
+engine = create_engine(
+    DATABASE_URL,
+    connect_args=connect_args,
+    pool_pre_ping=True  # Test connections before using them (important for cloud deployments)
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -225,8 +238,22 @@ def init_db():
 
 @app.get("/")
 async def root():
-    """Health check endpoint"""
+    """Root endpoint"""
     return {"message": "Task Tracker API is running", "version": "1.0.0"}
+
+@app.get("/health")
+async def health_check(db: Session = Depends(get_db)):
+    """Health check endpoint for monitoring services like Render"""
+    try:
+        # Test database connection
+        db.execute("SELECT 1")
+        return {
+            "status": "healthy",
+            "database": "connected",
+            "version": "1.0.0"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Database connection failed: {str(e)}")
 
 @app.get("/users", response_model=List[UserResponse])
 async def get_users(db: Session = Depends(get_db)):
