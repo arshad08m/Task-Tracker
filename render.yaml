@@ -18,8 +18,9 @@ services:
     autoDeploy: true
 
   # Frontend Service
-  - type: static
+  - type: web
     name: task-tracker-frontend
+    runtime: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     envVars:
