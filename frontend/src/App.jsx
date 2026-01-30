@@ -302,10 +302,10 @@ function App() {
           className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8"
         >
           <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">
               Task Tracker
             </h1>
-            <p className="text-gray-600">Collaborate and complete tasks together</p>
+            <p className="text-xs sm:text-sm text-gray-600">Collaborate and complete tasks together</p>
           </div>
           
           <UserSelector
@@ -317,20 +317,20 @@ function App() {
         </motion.div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="bg-white rounded-xl shadow-md p-6"
+            className="bg-white rounded-xl shadow-md p-4 sm:p-6"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm mb-1">Total Tasks</p>
-                <p className="text-3xl font-bold text-gray-800">{stats.total}</p>
+                <p className="text-gray-600 text-xs sm:text-sm mb-1">Total Tasks</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">{stats.total}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <ListTodo className="w-6 h-6 text-blue-600" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <ListTodo className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
             </div>
           </motion.div>
@@ -339,15 +339,15 @@ function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-xl shadow-md p-6"
+            className="bg-white rounded-xl shadow-md p-4 sm:p-6"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm mb-1">Pending</p>
-                <p className="text-3xl font-bold text-yellow-600">{stats.pending}</p>
+                <p className="text-gray-600 text-xs sm:text-sm mb-1">Pending</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-yellow-600">{stats.pending}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                <Clock className="w-6 h-6 text-yellow-600" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
               </div>
             </div>
           </motion.div>
@@ -356,37 +356,35 @@ function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-white rounded-xl shadow-md p-6"
+            className="bg-white rounded-xl shadow-md p-4 sm:p-6"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 text-sm mb-1">Completed</p>
-                <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
+                <p className="text-gray-600 text-xs sm:text-sm mb-1">Completed</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{stats.completed}</p>
               </div>
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Filters and Create Button */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <FilterBar
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              users={users}
-            />
-          </div>
+        <div className="flex flex-col gap-4 mb-6">
+          <FilterBar
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            users={users}
+          />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleCreateTask}
-            className="btn-primary flex items-center justify-center gap-2 whitespace-nowrap h-fit self-center md:self-start"
+            className="btn-primary w-full flex items-center justify-center gap-2 text-sm md:text-base py-3 md:py-2"
           >
             <Plus className="w-5 h-5" />
-            Create Task
+            Create New Task
           </motion.button>
         </div>
 
@@ -403,7 +401,7 @@ function App() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           >
             <AnimatePresence>
               {filteredTasks.map((task) => (

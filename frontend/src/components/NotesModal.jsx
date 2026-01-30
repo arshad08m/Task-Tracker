@@ -104,25 +104,25 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', damping: 20 }}
-          className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col"
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-start justify-between p-6 border-b">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-1">Task Notes</h2>
-              <p className="text-gray-600 text-sm">{task.title}</p>
+          <div className="flex items-start justify-between p-4 sm:p-6 border-b gap-4">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg sm:text-2xl font-bold text-gray-800 mb-1">Task Notes</h2>
+              <p className="text-gray-600 text-xs sm:text-sm truncate">{task.title}</p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1 flex-shrink-0"
             >
               <X className="w-6 h-6" />
             </button>
           </div>
 
           {/* Notes List */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             {task.notes && task.notes.length > 0 ? (
               task.notes.map((note) => (
                 <motion.div
@@ -141,17 +141,16 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
                         rows="3"
                         autoFocus
                       />
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         <button
                           onClick={() => handleSaveEdit(note.id)}
-                          className="btn-primary text-sm py-1 px-3 flex items-center gap-1"
+                          className="btn-primary text-xs sm:text-sm py-2 px-3 flex items-center gap-1"
                         >
                           <Save className="w-4 h-4" />
-                          Save
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="btn-secondary text-sm py-1 px-3"
+                          className="btn-secondary text-xs sm:text-sm py-2 px-3"
                         >
                           Cancel
                         </button>
@@ -160,19 +159,19 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
                   ) : (
                     // View mode
                     <>
-                      <div className="flex items-start justify-between mb-2">
-                        <p className="text-gray-700 flex-1">{note.content}</p>
-                        <div className="flex gap-1 ml-3">
+                      <div className="flex items-start justify-between mb-2 gap-3">
+                        <p className="text-gray-700 flex-1 text-sm">{note.content}</p>
+                        <div className="flex gap-1 flex-shrink-0">
                           <button
                             onClick={() => handleStartEdit(note)}
-                            className="text-gray-400 hover:text-primary-600 transition-colors p-1"
+                            className="icon-btn text-gray-400 hover:text-primary-600 transition-colors"
                             title="Edit note"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => onDeleteNote(note.id)}
-                            className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                            className="icon-btn text-gray-400 hover:text-red-600 transition-colors"
                             title="Delete note"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -191,13 +190,13 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
                             {note.attachments.map((attachment) => (
                               <div
                                 key={attachment.id}
-                                className="flex items-center justify-between bg-white p-2 rounded border border-gray-200 text-sm"
+                                className="flex items-center justify-between bg-white p-2 rounded border border-gray-200 text-xs sm:text-sm gap-2"
                               >
-                                <div className="flex items-center gap-2 flex-1">
+                                <div className="flex items-center gap-2 flex-1 min-w-0">
                                   {attachment.file_type === 'pdf' ? (
-                                    <FileText className="w-4 h-4 text-red-600" />
+                                    <FileText className="w-4 h-4 text-red-600 flex-shrink-0" />
                                   ) : (
-                                    <Image className="w-4 h-4 text-blue-600" />
+                                    <Image className="w-4 h-4 text-blue-600 flex-shrink-0" />
                                   )}
                                   <div className="flex-1 min-w-0">
                                     <p className="text-gray-700 truncate">{attachment.filename}</p>
@@ -206,17 +205,17 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
                                     </p>
                                   </div>
                                 </div>
-                                <div className="flex gap-1 ml-2">
+                                <div className="flex gap-1 ml-2 flex-shrink-0">
                                   <button
                                     onClick={() => handleDownloadAttachment(attachment)}
-                                    className="text-blue-600 hover:text-blue-800 transition-colors p-1"
+                                    className="icon-btn text-blue-600 hover:text-blue-800 transition-colors"
                                     title="Download"
                                   >
                                     <Download className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteAttachment(attachment.id)}
-                                    className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                                    className="icon-btn text-gray-400 hover:text-red-600 transition-colors"
                                     title="Delete attachment"
                                   >
                                     <Trash2 className="w-4 h-4" />
@@ -271,7 +270,7 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
           </div>
 
           {/* Add Note Section */}
-          <div className="border-t p-6">
+          <div className="border-t p-4 sm:p-6 space-y-3">
             {isAdding ? (
               <form onSubmit={handleAddNote} className="space-y-3">
                 <textarea
@@ -282,10 +281,10 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
                   placeholder="Write a note..."
                   autoFocus
                 />
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
                   <button
                     type="submit"
-                    className="btn-primary text-sm py-2 px-4"
+                    className="btn-primary text-sm py-2 px-4 flex-1 sm:flex-none"
                   >
                     Add Note
                   </button>
@@ -295,7 +294,7 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
                       setIsAdding(false);
                       setNewNote('');
                     }}
-                    className="btn-secondary text-sm py-2 px-4"
+                    className="btn-secondary text-sm py-2 px-4 flex-1 sm:flex-none"
                   >
                     Cancel
                   </button>
@@ -304,7 +303,7 @@ const NotesModal = ({ isOpen, onClose, task, onAddNote, onUpdateNote, onDeleteNo
             ) : (
               <button
                 onClick={() => setIsAdding(true)}
-                className="w-full btn-primary flex items-center justify-center gap-2"
+                className="w-full btn-primary flex items-center justify-center gap-2 text-sm md:text-base py-3 md:py-2"
               >
                 <Plus className="w-5 h-5" />
                 Add Note

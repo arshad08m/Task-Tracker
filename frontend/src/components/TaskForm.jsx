@@ -56,17 +56,17 @@ const TaskForm = ({ isOpen, onClose, onSubmit, task, users, currentUser }) => {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', damping: 20 }}
-          className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-800">
               {task ? 'Edit Task' : 'Create New Task'}
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
             >
               <X className="w-6 h-6" />
             </button>
@@ -76,7 +76,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, task, users, currentUser }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="title" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 Task Title *
               </label>
               <input
@@ -93,7 +93,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, task, users, currentUser }) => {
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="description" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 Description *
               </label>
               <textarea
@@ -110,7 +110,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, task, users, currentUser }) => {
 
             {/* Assigned User */}
             <div>
-              <label htmlFor="assigned_to" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="assigned_to" className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
                 Assign To *
               </label>
               <select
@@ -135,13 +135,13 @@ const TaskForm = ({ isOpen, onClose, onSubmit, task, users, currentUser }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 btn-secondary"
+                className="flex-1 btn-secondary text-sm md:text-base"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 btn-primary"
+                className="flex-1 btn-primary text-sm md:text-base"
               >
                 {task ? 'Update Task' : 'Create Task'}
               </button>
