@@ -255,17 +255,18 @@ def init_db():
 def ensure_schema():
     """Ensure required columns exist (lightweight runtime migration)."""
     try:
-        inspector = inspect(engine)
-        if "tasks" not in inspector.get_table_names():
-            return
+        with engine.begin() as conn:
+            inspector = inspect(conn)
+            if "tasks" not in inspector.get_table_names():
+                return
 
-        columns = {col["name"] for col in inspector.get_columns("tasks")}
-        if "assigned_by" not in columns:
-            if is_sqlite:
-                engine.execute(text("ALTER TABLE tasks ADD COLUMN assigned_by INTEGER"))
-            else:
-                engine.execute(text("ALTER TABLE tasks ADD COLUMN assigned_by INTEGER"))
-            print("✅ Added missing column: tasks.assigned_by")
+            columns = {col["name"] for col in inspector.get_columns("tasks")}
+            if "assigned_by" not in columns:
+                if is_sqlite:
+                    conn.execute(text("ALTER TABLE tasks ADD COLUMN assigned_by INTEGER"))
+                else:
+                    conn.execute(text("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS assigned_by INTEGER"))
+                print("✅ Added missing column: tasks.assigned_by")
     except Exception as e:
         print(f"⚠️ Schema check warning: {e}")
 
