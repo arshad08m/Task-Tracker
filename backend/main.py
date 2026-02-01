@@ -5,7 +5,7 @@ A simple task management API for 2 users with notes support
 from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker, Session, relationship
 from pydantic import BaseModel, ConfigDict
 from typing import Optional, List
@@ -252,6 +252,23 @@ def init_db():
     finally:
         db.close()
 
+def ensure_schema():
+    """Ensure required columns exist (lightweight runtime migration)."""
+    try:
+        inspector = inspect(engine)
+        if "tasks" not in inspector.get_table_names():
+            return
+
+        columns = {col["name"] for col in inspector.get_columns("tasks")}
+        if "assigned_by" not in columns:
+            if is_sqlite:
+                engine.execute(text("ALTER TABLE tasks ADD COLUMN assigned_by INTEGER"))
+            else:
+                engine.execute(text("ALTER TABLE tasks ADD COLUMN assigned_by INTEGER"))
+            print("✅ Added missing column: tasks.assigned_by")
+    except Exception as e:
+        print(f"⚠️ Schema check warning: {e}")
+
 # API Endpoints
 
 @app.on_event("startup")
@@ -259,6 +276,7 @@ async def startup_event():
     """Initialize database on startup"""
     try:
         Base.metadata.create_all(bind=engine)
+        ensure_schema()
         init_db()
         print("✅ Database initialized with tables and seed data")
     except Exception as e:
