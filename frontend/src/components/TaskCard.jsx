@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CheckCircle2, Circle, Trash2, Edit, MessageSquare, Clock, User } from 'lucide-react';
+import { CheckCircle2, Circle, Trash2, Edit, MessageSquare, Clock, User, UserPlus } from 'lucide-react';
 import { formatDate, getStatusColor } from '../utils/helpers';
 
 /**
@@ -50,10 +50,16 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete, onViewNotes }) => 
 
       {/* Metadata */}
       <div className="flex items-center gap-2 sm:gap-4 text-xs text-gray-500 mb-4 flex-wrap">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1" title="Assigned to">
           <User className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{task.assigned_user.display_name}</span>
         </div>
+        {task.assigner && (
+          <div className="flex items-center gap-1" title="Assigned by">
+            <UserPlus className="w-4 h-4 flex-shrink-0" />
+            <span className="truncate">{task.assigner.display_name}</span>
+          </div>
+        )}
         <div className="flex items-center gap-1">
           <Clock className="w-4 h-4 flex-shrink-0" />
           <span className="truncate">{formatDate(task.created_at)}</span>

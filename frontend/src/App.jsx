@@ -9,6 +9,7 @@ import FilterBar from './components/FilterBar';
 import TaskCard from './components/TaskCard';
 import TaskForm from './components/TaskForm';
 import NotesModal from './components/NotesModal';
+import TaskTabs from './components/TaskTabs';
 
 // Services and utilities
 import apiService from './services/api';
@@ -25,6 +26,12 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [filters, setFilters] = useState({});
+  const [activeTab, setActiveTab] = useState('assigned_to_me');
+  const [tasksByView, setTasksByView] = useState({
+    assigned_to_me: [],
+    assigned_by_me: [],
+    all_tasks: [],
+  });
   const [loading, setLoading] = useState(true);
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [isNotesModalOpen, setIsNotesModalOpen] = useState(false);
@@ -47,6 +54,13 @@ function App() {
     }
   }, [currentUser, filters]);
 
+  // Update displayed tasks when tab changes
+  useEffect(() => {
+    const currentTabTasks = tasksByView[activeTab] || [];
+    setTasks(currentTabTasks);
+    setFilteredTasks(currentTabTasks);
+  }, [activeTab, tasksByView]);
+
   /**
    * Fetch all users from API
    */
@@ -67,13 +81,27 @@ function App() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getTasks(filters);
-      const tasksArray = Array.isArray(data) ? data : [];
-      setTasks(tasksArray);
-      setFilteredTasks(tasksArray);
+      const data = await apiService.getMyTasksView(currentUser.id, filters);
+      
+      // Store tasks by view
+      setTasksByView({
+        assigned_to_me: Array.isArray(data.assigned_to_me) ? data.assigned_to_me : [],
+        assigned_by_me: Array.isArray(data.assigned_by_me) ? data.assigned_by_me : [],
+        all_tasks: Array.isArray(data.all_tasks) ? data.all_tasks : [],
+      });
+      
+      // Set tasks based on active tab
+      const currentTabTasks = data[activeTab] || [];
+      setTasks(currentTabTasks);
+      setFilteredTasks(currentTabTasks);
     } catch (error) {
       toast.error('Failed to load tasks');
       console.error('Error fetching tasks:', error);
+      setTasksByView({
+        assigned_to_me: [],
+        assigned_by_me: [],
+        all_tasks: [],
+      });
       setTasks([]);
       setFilteredTasks([]);
     } finally {
@@ -99,6 +127,13 @@ function App() {
     setTasks([]);
     setFilters({});
     toast.success('Logged out successfully');
+  };
+
+  /**
+   * Handle tab changes
+   */
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
   };
 
   /**
@@ -270,11 +305,18 @@ function App() {
     }
   };
 
-  // Calculate stats
+  // Calculate stats for current tab
   const stats = {
     total: tasks.length,
     pending: tasks.filter(t => t.status === 'Pending').length,
     completed: tasks.filter(t => t.status === 'Completed').length,
+  };
+
+  // Calculate counts for each tab
+  const tabCounts = {
+    assigned_to_me: tasksByView.assigned_to_me.length,
+    assigned_by_me: tasksByView.assigned_by_me.length,
+    all_tasks: tasksByView.all_tasks.length,
   };
 
   // Show login screen if no user is logged in
@@ -369,6 +411,13 @@ function App() {
             </div>
           </motion.div>
         </div>
+
+        {/* Tabs Navigation */}
+        <TaskTabs
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          counts={tabCounts}
+        />
 
         {/* Filters and Create Button */}
         <div className="flex flex-col gap-4 mb-6">

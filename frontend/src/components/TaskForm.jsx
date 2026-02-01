@@ -11,6 +11,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, task, users, currentUser }) => {
     title: '',
     description: '',
     assigned_to: currentUser?.id || '',
+    assigned_by: currentUser?.id || null,
   });
 
   // Populate form when editing
@@ -20,12 +21,14 @@ const TaskForm = ({ isOpen, onClose, onSubmit, task, users, currentUser }) => {
         title: task.title,
         description: task.description,
         assigned_to: task.assigned_to,
+        assigned_by: task.assigned_by || currentUser?.id,
       });
     } else {
       setFormData({
         title: '',
         description: '',
         assigned_to: currentUser?.id || '',
+        assigned_by: currentUser?.id || null,
       });
     }
   }, [task, currentUser]);

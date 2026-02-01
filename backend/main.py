@@ -49,7 +49,6 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     display_name = Column(String)
-    tasks = relationship("Task", back_populates="assigned_user")
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -59,10 +58,12 @@ class Task(Base):
     description = Column(String)
     status = Column(String, default="Pending")  # Pending or Completed
     assigned_to = Column(Integer, ForeignKey("users.id"))
+    assigned_by = Column(Integer, ForeignKey("users.id"), nullable=True)  # Who created/assigned the task
     created_at = Column(DateTime, default=datetime.utcnow)
     completed_at = Column(DateTime, nullable=True)
     
-    assigned_user = relationship("User", back_populates="tasks")
+    assigned_user = relationship("User", foreign_keys=[assigned_to], backref="assigned_tasks")
+    assigner = relationship("User", foreign_keys=[assigned_by])
     notes = relationship("Note", back_populates="task", cascade="all, delete-orphan")
 
 class Note(Base):
@@ -124,7 +125,7 @@ class TaskBase(BaseModel):
     assigned_to: int
 
 class TaskCreate(TaskBase):
-    pass
+    assigned_by: Optional[int] = None
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -139,19 +140,18 @@ class TaskResponse(TaskBase):
     status: str
     created_at: datetime
     completed_at: Optional[datetime]
+    assigned_by: Optional[int] = None
     assigned_user: UserResponse
+    assigner: Optional[UserResponse] = None
     notes: List[NoteResponse] = []
+
+class MyTasksViewResponse(BaseModel):
+    assigned_to_me: List[TaskResponse]
+    assigned_by_me: List[TaskResponse]
+    all_tasks: List[TaskResponse]
 
 # Initialize FastAPI app
 app = FastAPI(title="Task Tracker API", version="1.0.0")
-
-# Initialize database on startup
-try:
-    Base.metadata.create_all(bind=engine)
-    init_db()
-    print("✅ Database initialized with tables and seed data")
-except Exception as e:
-    print(f"⚠️ Database initialization warning: {e}")
 
 # Mount uploads directory for static file serving
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
@@ -206,6 +206,7 @@ def init_db():
                     title="Setup development environment",
                     description="Install all necessary tools and dependencies",
                     assigned_to=user_a.id,
+                    assigned_by=user_b.id,  # Haha assigned this to Hehe
                     status="Completed",
                     completed_at=datetime.utcnow()
                 ),
@@ -213,6 +214,7 @@ def init_db():
                     title="Design database schema",
                     description="Create ERD and define relationships",
                     assigned_to=user_b.id,
+                    assigned_by=user_a.id,  # Hehe assigned this to Haha
                     status="Completed",
                     completed_at=datetime.utcnow()
                 ),
@@ -220,12 +222,14 @@ def init_db():
                     title="Implement API endpoints",
                     description="Build REST API with FastAPI",
                     assigned_to=user_a.id,
+                    assigned_by=user_b.id,  # Haha assigned this to Hehe
                     status="Pending"
                 ),
                 Task(
                     title="Build React frontend",
                     description="Create responsive UI with React and TailwindCSS",
                     assigned_to=user_b.id,
+                    assigned_by=user_a.id,  # Hehe assigned this to Haha
                     status="Pending"
                 ),
             ]
@@ -249,6 +253,16 @@ def init_db():
         db.close()
 
 # API Endpoints
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database on startup"""
+    try:
+        Base.metadata.create_all(bind=engine)
+        init_db()
+        print("✅ Database initialized with tables and seed data")
+    except Exception as e:
+        print(f"⚠️ Database initialization warning: {e}")
 
 @app.get("/")
 async def root():
@@ -292,6 +306,46 @@ async def get_tasks(
     tasks = query.order_by(Task.created_at.desc()).all()
     return tasks
 
+@app.get("/tasks/my-view", response_model=MyTasksViewResponse)
+async def get_my_tasks_view(
+    user_id: int,
+    status: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """
+    Get tasks organized by view type for a specific user
+    Returns:
+    - assigned_to_me: Tasks assigned to the user
+    - assigned_by_me: Tasks created/assigned by the user
+    - all_tasks: All tasks
+    """
+    # Verify user exists
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Build base queries
+    assigned_to_query = db.query(Task).filter(Task.assigned_to == user_id)
+    assigned_by_query = db.query(Task).filter(Task.assigned_by == user_id)
+    all_tasks_query = db.query(Task)
+    
+    # Apply status filter if provided
+    if status:
+        assigned_to_query = assigned_to_query.filter(Task.status == status)
+        assigned_by_query = assigned_by_query.filter(Task.status == status)
+        all_tasks_query = all_tasks_query.filter(Task.status == status)
+    
+    # Execute queries and order by created_at
+    assigned_to_me = assigned_to_query.order_by(Task.created_at.desc()).all()
+    assigned_by_me = assigned_by_query.order_by(Task.created_at.desc()).all()
+    all_tasks = all_tasks_query.order_by(Task.created_at.desc()).all()
+    
+    return {
+        "assigned_to_me": assigned_to_me,
+        "assigned_by_me": assigned_by_me,
+        "all_tasks": all_tasks
+    }
+
 @app.get("/tasks/{task_id}", response_model=TaskResponse)
 async def get_task(task_id: int, db: Session = Depends(get_db)):
     """Get a specific task by ID"""
@@ -308,10 +362,17 @@ async def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Verify assigner exists if provided
+    if task.assigned_by:
+        assigner = db.query(User).filter(User.id == task.assigned_by).first()
+        if not assigner:
+            raise HTTPException(status_code=404, detail="Assigner user not found")
+    
     db_task = Task(
         title=task.title,
         description=task.description,
         assigned_to=task.assigned_to,
+        assigned_by=task.assigned_by,
         status="Pending"
     )
     db.add(db_task)

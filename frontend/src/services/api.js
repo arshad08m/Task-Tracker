@@ -29,6 +29,15 @@ const apiService = {
     return response.data;
   },
 
+  getMyTasksView: async (userId, filters = {}) => {
+    const params = new URLSearchParams();
+    params.append('user_id', userId);
+    if (filters.status) params.append('status', filters.status);
+    
+    const response = await api.get(`/tasks/my-view?${params.toString()}`);
+    return response.data;
+  },
+
   getTask: async (taskId) => {
     const response = await api.get(`/tasks/${taskId}`);
     return response.data;

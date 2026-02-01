@@ -3,7 +3,7 @@ import { Filter } from 'lucide-react';
 
 /**
  * FilterBar Component
- * Allows filtering tasks by user and status
+ * Allows filtering tasks by status (user filtering now handled by tabs)
  */
 const FilterBar = ({ filters, onFilterChange, users }) => {
   return (
@@ -15,27 +15,7 @@ const FilterBar = ({ filters, onFilterChange, users }) => {
       <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
         <div className="flex items-center gap-2 text-gray-600 font-medium text-sm md:text-base">
           <Filter className="w-4 h-4 md:w-5 md:h-5" />
-          <span className="hidden sm:inline">Filters:</span>
-        </div>
-
-        {/* User Filter */}
-        <div className="flex items-center gap-2 flex-1 sm:flex-none min-w-max">
-          <label htmlFor="user-filter" className="text-xs md:text-sm text-gray-600 whitespace-nowrap">
-            Assigned to:
-          </label>
-          <select
-            id="user-filter"
-            value={filters.assigned_to || ''}
-            onChange={(e) => onFilterChange('assigned_to', e.target.value)}
-            className="input-field py-2 md:py-1 px-3 text-xs md:text-sm"
-          >
-            <option value="">All Users</option>
-            {users.map(user => (
-              <option key={user.id} value={user.id}>
-                {user.display_name}
-              </option>
-            ))}
-          </select>
+          <span className="hidden sm:inline">Filter:</span>
         </div>
 
         {/* Status Filter */}
@@ -56,12 +36,12 @@ const FilterBar = ({ filters, onFilterChange, users }) => {
         </div>
 
         {/* Clear Filters */}
-        {(filters.assigned_to || filters.status) && (
+        {filters.status && (
           <button
             onClick={() => onFilterChange('clear')}
             className="text-xs md:text-sm text-primary-600 hover:text-primary-700 font-medium transition-colors whitespace-nowrap"
           >
-            Clear Filters
+            Clear Filter
           </button>
         )}
       </div>
